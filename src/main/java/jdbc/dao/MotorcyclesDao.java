@@ -1,6 +1,5 @@
 package jdbc.dao;
 
-import jdbc.entity.Manufacturers;
 import jdbc.entity.Motorcycles;
 import jdbc.exception.DaoException;
 import jdbc.utils.ConnectionManager;
@@ -39,6 +38,13 @@ public class MotorcyclesDao implements Dao<Integer, Motorcycles> {
             
             """;
 
+    private final static String FIND_ALL_BY_CUSTOMER_ID_SQL = FIND_ALL_SQL + """
+            join public.orders_items oi on m.id = oi.motorcycle_id
+            join public.orders o on o.id = oi.order_id
+            join public.customers c on c.id = o.customers_id
+            where c.id = ?
+            """;
+
     private final static String FIND_BY_ID_SQL = FIND_ALL_SQL + """
             WHERE m.id = ?
             """;
@@ -55,7 +61,7 @@ public class MotorcyclesDao implements Dao<Integer, Motorcycles> {
             where id = ?
             """;
 
-    private Motorcycles buildManufacturers(ResultSet result) throws SQLException {
+    private Motorcycles buildMotorcycles(ResultSet result) throws SQLException {
         return new Motorcycles(result.getInt("id"),
                 result.getString("model"),
                 manufacturersDao.findById(
@@ -66,6 +72,20 @@ public class MotorcyclesDao implements Dao<Integer, Motorcycles> {
                 result.getBigDecimal("price"),
                 result.getInt("quantity"));
     }
+
+   public List<Motorcycles> findAllByCustomerId (Integer id){
+        try (var connection = ConnectionManager.get();
+             var statement = connection.prepareStatement(FIND_ALL_BY_CUSTOMER_ID_SQL)){
+            List<Motorcycles> motorcycles = new ArrayList<>();
+            statement.setInt(1, id);
+            var resultSet = statement.executeQuery();
+            while (resultSet.next())
+                motorcycles.add(buildMotorcycles(resultSet));
+            return motorcycles;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+   }
 
     @Override
     public boolean update(Motorcycles motorcycles) {
@@ -92,7 +112,7 @@ public class MotorcyclesDao implements Dao<Integer, Motorcycles> {
 
             var result = statement.executeQuery();
             while (result.next())
-                tickets.add(buildManufacturers(result));
+                tickets.add(buildMotorcycles(result));
 
 
             return tickets;
@@ -107,7 +127,7 @@ public class MotorcyclesDao implements Dao<Integer, Motorcycles> {
             Motorcycles motorcycles = null;
             var result = statement.executeQuery();
             if (result.next())
-                motorcycles = buildManufacturers(result);
+                motorcycles = buildMotorcycles(result);
             return Optional.ofNullable(motorcycles);
         } catch (SQLException e) {
             throw new DaoException(e);
