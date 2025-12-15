@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jdbc.service.CustomersService;
 import jdbc.service.MotorcyclesService;
+import jdbc.utils.JspHelper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,17 +22,10 @@ public class MotorcyclesServlet extends HttpServlet {
         resp.setContentType("text/html");
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        Integer customerId = Integer.valueOf(req.getParameter("customerId"));
+        Integer customersId = Integer.valueOf(req.getParameter("customersId"));
 
-        try (var writer = resp.getWriter();){
-            writer.write("<h1>Купленные мотоциклы:</h1>");
-            writer.write("<ul>");
-            motorcyclesService.findAllByCustomerId(customerId).stream().forEach(motorcyclesDto ->
-                    writer.write("""
-                            <li>%s</li>
-                            """.formatted(motorcyclesDto.toString())));
-            writer.write("</ul>");
-        }
+        req.setAttribute("motorcycles", motorcyclesService.findAllByCustomerId(customersId));
+        req.getRequestDispatcher(JspHelper.getPath("motorcycles")).forward(req, resp);
 
     }
 }
