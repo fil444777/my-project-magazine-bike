@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <!-- Глобальные свойства для переиспользования -->
+        <Property name="pattern">[%d{HH:mm:ss,SSS}] %p [%c{1.}] %m%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Консоль -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern}"/>
+        </Console>
+
+        <!-- Файл с ротацией -->
+        <RollingFile name="File" fileName="logs/app.log"
+                     filePattern="logs/app-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>  <!-- Ротация по дате -->
+                <SizeBasedTriggeringPolicy size="10MB"/>  <!-- Ротация по размеру -->
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>  <!-- Хранить 30 файлов -->
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Логгирование SQL Hibernate -->
+        <Logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <Logger name="org.hibernate.type.descriptor.sql" level="TRACE" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- Логгирование своего пакета -->
+        <Logger name="hibernate" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+
+        <!-- Корневой логгер (для всех остальных классов) -->
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+    </Configuration>
