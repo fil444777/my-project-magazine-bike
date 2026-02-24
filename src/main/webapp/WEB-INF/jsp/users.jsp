@@ -8,12 +8,12 @@
 <%@include file="header.jsp"%>
 <h1>Список клиентов:</h1>
 
-<c:if test="${not empty requestScope.customers}">
+<c:if test="${not empty requestScope.users}">
     <ul>
-        <c:forEach var="customer" items="${requestScope.customers}">
+        <c:forEach var="user" items="${requestScope.users}">
             <li>
-                <a href="${pageContext.request.contextPath}/motorcycles?customerId=${customer.id}">
-                        ${customer.personalInfo.name} (${customer.email})
+                <a href="${pageContext.request.contextPath}/motorcycles?userId=${user.id}">
+                        ${user.personalInfo.name} (${user.email})
                 </a>
             </li>
         </c:forEach>

@@ -1,6 +1,6 @@
 package hibernate.dao;
 
-import hibernate.entity.Motorcycles;
+import hibernate.entity.Motorcycle;
 import hibernate.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -8,7 +8,7 @@ import org.hibernate.SessionFactory;
 import java.util.List;
 import java.util.Optional;
 
-public class MotorcyclesDao implements Dao<Integer, Motorcycles> {
+public class MotorcyclesDao implements Dao<Integer, Motorcycle> {
     private static final MotorcyclesDao INSTANCE = new MotorcyclesDao();
 
     private MotorcyclesDao() {
@@ -19,22 +19,35 @@ public class MotorcyclesDao implements Dao<Integer, Motorcycles> {
     }
 
     @Override
-    public boolean update(Motorcycles motorcycles) {
+    public boolean update(Motorcycle motorcycles) {
         return false;
     }
 
     @Override
-    public List<Motorcycles> findAll() {
-        return List.of();
+    public List<Motorcycle> findAll() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("""
+                    select distinct m 
+                    from Motorcycle m
+                    left join fetch m.manufacturer""", Motorcycle.class).getResultList();
+        }
     }
 
     @Override
-    public Optional<Motorcycles> findById(Integer id) {
-        return Optional.empty();
+    public Optional<Motorcycle> findById(Integer motorcycleId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("""
+                            select distinct m 
+                            from Motorcycle m
+                            left join fetch m.manufacturer
+                            where m.id = :motorcycleId""", Motorcycle.class)
+                    .setParameter("motorcycleId", motorcycleId)
+                    .uniqueResultOptional();
+        }
     }
 
     @Override
-    public Motorcycles save(Motorcycles motorcycles) {
+    public Motorcycle save(Motorcycle motorcycles) {
         return null;
     }
 
@@ -43,19 +56,19 @@ public class MotorcyclesDao implements Dao<Integer, Motorcycles> {
         return false;
     }
 
-    public List<Motorcycles> findAllByUserId(Integer userId) {
-        try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
-             Session session = sessionFactory.openSession()){
+    public List<Motorcycle> findAllByUserId(Integer userId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
-                            "SELECT DISTINCT o.motorcycles " +  // DISTINCT чтобы избежать дубликатов
-                                    "FROM Order o " +
+                            "SELECT DISTINCT m " +
+                                    "FROM Motorcycle m " +
+                                    "LEFT JOIN FETCH m.manufacturer " +
+                                    "JOIN m.orders o " +
                                     "WHERE o.user.id = :userId " +
-                                    "ORDER BY o.motorcycles.model",
-                            Motorcycles.class
+                                    "ORDER BY m.model",
+                            Motorcycle.class
                     )
                     .setParameter("userId", userId)
                     .getResultList();
         }
-
     }
 }

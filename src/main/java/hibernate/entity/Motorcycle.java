@@ -2,7 +2,6 @@ package hibernate.entity;
 
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Motorcycles {
+@Table(name = "motorcycles")
+public class Motorcycle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,7 @@ public class Motorcycles {
 
     @ManyToOne
     @JoinColumn(name = "manufacturers_id")
-    private Manufacturers manufacturers;
+    private Manufacturer manufacturer;
 
     @OneToMany(
             mappedBy = "motorcycles",
@@ -40,4 +40,5 @@ public class Motorcycles {
             fetch = FetchType.LAZY
     )
     private List<Order> orders = new ArrayList<>();
+
 }

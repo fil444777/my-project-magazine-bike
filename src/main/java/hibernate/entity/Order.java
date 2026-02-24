@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -33,5 +33,5 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "motorcycles_id")
-    private Motorcycles motorcycles;
+    private Motorcycle motorcycles;
 }

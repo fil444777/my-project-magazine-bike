@@ -2,20 +2,19 @@ package hibernate.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@ToString(exclude = {"motorcycle"})
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class Manufacturers {
+@Table(name = "manufacturers")
+public class Manufacturer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +23,9 @@ public class Manufacturers {
     private String name;
 
     @OneToMany(
-            mappedBy = "manufacturers",
+            mappedBy = "manufacturer",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY
     )
-    private List<Motorcycles> motorcycles = new ArrayList<>();
+    private List<Motorcycle> motorcycle = new ArrayList<>();
 }

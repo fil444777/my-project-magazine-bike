@@ -49,6 +49,6 @@ public class LoginServlet extends HttpServlet {
         log.info("User '{}' successfully logged in", user.getEmail());
 
         req.getSession().setAttribute("user", user);
-        resp.sendRedirect("/customers");
+        resp.sendRedirect("/users");
     }
 }

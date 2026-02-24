@@ -19,8 +19,7 @@ public class UserDao implements Dao<Integer, User> {
     }
 
     public Optional<User> findByEmailAndPassword(String email, String password) {
-        try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             User user = session.createQuery(
                             "SELECT u FROM User u WHERE u.email = :email AND u.password = :password",
                             User.class
@@ -40,9 +39,12 @@ public class UserDao implements Dao<Integer, User> {
 
     @Override
     public List<User> findAll() {
-        try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
-           return session.createQuery("FROM User u ORDER BY u.id", User.class)
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("""
+                            FROM User u 
+                            LEFT JOIN FETCH u.orders
+                            ORDER BY u.id
+                            """, User.class)
                     .getResultList();
         }
     }
@@ -54,8 +56,7 @@ public class UserDao implements Dao<Integer, User> {
 
     @Override
     public User save(User user) {
-        try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             session.beginTransaction();
             session.persist(user);
             session.getTransaction().commit();

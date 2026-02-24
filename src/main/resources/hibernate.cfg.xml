@@ -11,8 +11,9 @@
     <property name="show_sql">true</property>
     <property name="format_sql">true</property>
     <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
-    <mapping class="hibernate.entity.Motorcycles"/>
-    <mapping class="hibernate.entity.Manufacturers"/>
+    <property name="hibernate.hbm2ddl.auto">create</property>
+    <mapping class="hibernate.entity.Motorcycle"/>
+    <mapping class="hibernate.entity.Manufacturer"/>
     <mapping class="hibernate.entity.Order"/>
     <mapping class="hibernate.entity.User"/>
   </session-factory>

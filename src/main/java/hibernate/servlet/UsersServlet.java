@@ -15,20 +15,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
-@WebServlet("/customers")
-public class CustomersServlet extends HttpServlet {
+@WebServlet("/users")
+public class UsersServlet extends HttpServlet {
     private final UserService userService = UserService.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html");
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        List<User> customers = userService.findAll();
+        List<User> users = userService.findAll();
 
-        log.info("Loaded {} customers", customers.size());
+        log.info("Loaded {} users", users.size());
 
-        req.setAttribute("customers", customers);
-        req.getRequestDispatcher(JspHelper.getPath("customers")).forward(req, resp);
+        req.setAttribute("users", users);
+        req.getRequestDispatcher(JspHelper.getPath("users")).forward(req, resp);
     }
 }
 
