@@ -1,48 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="WARN" monitorInterval="30">
+
     <Properties>
-        <!-- Глобальные свойства для переиспользования -->
-        <Property name="pattern">[%d{HH:mm:ss,SSS}] %p [%c{1.}] %m%n</Property>
+        <!-- Пути и имена файлов -->
+        <Property name="LOG_PATH">logs</Property>
+        <Property name="LOG_FILE_NAME">app</Property>
+
+        <!-- Паттерн для консоли (короткий, цветной можно добавить) -->
+        <Property name="CONSOLE_PATTERN">[%d{HH:mm:ss,SSS}] %-5p [%c{1.}] %m%n</Property>
+
+        <!-- Паттерн для файла (полный, с классом и методом) -->
+        <Property name="FILE_PATTERN">[%d{yyyy-MM-dd HH:mm:ss,SSS}] %-5p [%t] [%c{1.}#%M:%L] %m%n</Property>
     </Properties>
 
     <Appenders>
-        <!-- Консоль -->
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="${pattern}"/>
+        <!-- === Консоль === -->
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${CONSOLE_PATTERN}"/>
         </Console>
 
-        <!-- Файл с ротацией -->
-        <RollingFile name="File" fileName="logs/app.log"
-                     filePattern="logs/app-%d{yyyy-MM-dd}.log">
-            <PatternLayout pattern="${pattern}"/>
+        <!-- === Файл с ротацией === -->
+        <RollingFile name="File"
+                     fileName="${LOG_PATH}/${LOG_FILE_NAME}.log"
+                     filePattern="${LOG_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+
+            <PatternLayout pattern="${FILE_PATTERN}"/>
+
             <Policies>
-                <TimeBasedTriggeringPolicy/>  <!-- Ротация по дате -->
-                <SizeBasedTriggeringPolicy size="10MB"/>  <!-- Ротация по размеру -->
+                <!-- Ротация каждый день -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!-- Ротация если файл больше 10MB -->
+                <SizeBasedTriggeringPolicy size="10MB"/>
             </Policies>
-            <DefaultRolloverStrategy max="30"/>  <!-- Хранить 30 файлов -->
+
+            <!-- Хранить максимум 30 файлов, удалить старые -->
+            <DefaultRolloverStrategy max="30" fileIndex="min">
+                <Delete basePath="${LOG_PATH}" maxDepth="1">
+                    <IfFileName glob="${LOG_FILE_NAME}-*.log.gz"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingFile>
     </Appenders>
 
     <Loggers>
-        <!-- Логгирование SQL Hibernate -->
         <Logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
 
-        <Logger name="org.hibernate.type.descriptor.sql" level="TRACE" additivity="false">
+        <!-- Параметры запросов (bind parameters) - TRACE уровень -->
+        <Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
 
-        <!-- Логгирование своего пакета -->
+        <Logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false">
+            <AppenderRef ref="File"/>
+        </Logger>
+
         <Logger name="hibernate" level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
         </Logger>
 
-        <!-- Корневой логгер (для всех остальных классов) -->
         <Root level="INFO">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
         </Root>
     </Loggers>
-    </Configuration>
+</Configuration>

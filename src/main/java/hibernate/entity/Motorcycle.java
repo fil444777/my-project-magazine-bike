@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "motorcycles")
+@Audited
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "Motorcycles")
 public class Motorcycle {
 
     @Id

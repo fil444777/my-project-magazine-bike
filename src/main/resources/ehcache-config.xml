@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache:config
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns:ehcache='http://www.ehcache.org/v3'
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.1.xsd">
+
+    <ehcache:cache alias="Users" uses-template="simp"/>
+    <ehcache:cache alias="Motorcycles" uses-template="simple"/>
+    <ehcache:cache alias="Manufacturers" uses-template="simple"/>
+    <ehcache:cache alias="Orders" uses-template="simp"/>
+
+    <ehcache:cache-template name="simple">
+        <ehcache:expiry>
+            <ehcache:ttl>10</ehcache:ttl>
+        </ehcache:expiry>
+        <ehcache:heap>1000</ehcache:heap>
+    </ehcache:cache-template>
+
+    <ehcache:cache-template name="simp">
+        <ehcache:expiry>
+            <ehcache:ttl>100</ehcache:ttl>
+        </ehcache:expiry>
+        <ehcache:heap>1000</ehcache:heap>
+    </ehcache:cache-template>
+
+</ehcache:config>
